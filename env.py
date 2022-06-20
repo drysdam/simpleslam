@@ -43,6 +43,9 @@ class Line():
             fig, ax = plt.subplots()
         ax.plot(x, y)
 
+    def inbounds(self, xy):
+        return True
+        
     def intersection(self, l2):
         # https://www.cuemath.com/geometry/intersection-of-two-lines/
         # I bet linear algebra would actually be faster...
@@ -57,7 +60,10 @@ class Line():
         if denom == 0:
             return None
 
-        return np.array([num1/float(denom), num2/float(denom)])
+        xy = [num1/float(denom), num2/float(denom)]
+        if self.inbounds(xy) and l2.inbounds(xy):
+            return np.array(xy)
+        return None
 
 class Segment(Line):
     def __init__(self, xy1, xy2):
@@ -106,30 +112,24 @@ class Segment(Line):
             fig, ax = plt.subplots()
         ax.plot(x, y)
 
+    def inbounds(self, xy):
+        x, y = xy
+        if (x < min(self.xy1[0], self.xy2[0])
+            or x > max(self.xy1[0], self.xy2[0])
+            or y < min(self.xy1[1], self.xy2[1])
+            or y > max(self.xy1[1], self.xy2[1])):
+            return False
+        return True
+
     def intersection(self, l2):
         try:
             x, y = Line.intersection(self, l2)
         except TypeError:
             return None
 
-        if (x < min(self.xy1[0], self.xy2[0])
-            or x > max(self.xy1[0], self.xy2[0])
-            or y < min(self.xy1[1], self.xy2[1])
-            or y > max(self.xy1[1], self.xy2[1])):
-            return None
-
-        try:
-            l2xy1, l2xy2 = l2.xy1, l2.xy2
-        except AttributeError:
+        if self.inbounds([x, y]) and l2.inbounds([x, y]):
             return np.array([x, y])
-
-        if (x < min(l2xy1[0], l2xy2[0])
-            or x > max(l2xy1[0], l2xy2[0])
-            or y < min(l2xy1[1], l2xy2[1])
-            or y > max(l2xy1[1], l2xy2[1])):
-            return None
-        
-        return np.array([x, y])
+        return None
         
 if __name__ == '__main__':
     fig, ax = plt.subplots()
@@ -143,24 +143,25 @@ if __name__ == '__main__':
     # x = 50
     l4 = Line(1, 0, -50)
 
-    for la in [l1, l2, l3, l4]:
+    s1 = Segment((-10,40), (10,40))
+    s2 = Segment((5,10), (5,20))
+
+    for la in [l1, l2, l3, l4, s1, s2]:
         la.graph(size=101, ax=ax)
-        for lb in [l1, l2, l3, l4]:
+        for lb in [l1, l2, l3, l4, s1, s2]:
             try:
                 x, y = la.intersection(lb)
             except TypeError:
                 continue
             plt.plot(x, y, 'o')
 
-    s1 = Segment((-10,40), (10,40))
-    s2 = Segment((5,10), (5,20))
-    for sa in [s1, s2]:
-        sa.graph(ax=ax)
-        for sb in [s1, s2]:
-            try:
-                x, y = sa.intersection(sb)
-            except TypeError:
-                continue
-            plt.plot(x, y, 'o')
+    # for sa in [s1, s2]:
+    #     sa.graph(ax=ax)
+    #     for sb in [s1, s2]:
+    #         try:
+    #             x, y = sa.intersection(sb)
+    #         except TypeError:
+    #             continue
+    #         plt.plot(x, y, 'o')
     
     plt.show()
