@@ -58,24 +58,19 @@ if __name__ == '__main__':
     # y = -1x + 1
     l2 = Line(-1, -1, 1)
     l2.graph(ax)
-    # y = 0
-    l3 = Line(0, 1, 0)
+    # y = 3
+    l3 = Line(0, 1, -3)
     l3.graph(ax)
-    # x = 0
-    l4 = Line(1, 0, 0)
+    # x = 5
+    l4 = Line(1, 0, -5)
     l4.graph(ax)
 
-    x, y = l1.intersection(l2)
-    plt.plot(x, y, 'o')
-    x, y = l2.intersection(l1)
-    plt.plot(x, y, 'o')
-    # x, y = l1.intersection(l1)
-    # plt.plot(x, y, 'o')
-    x, y = l1.intersection(l3)
-    plt.plot(x, y, 'o')
-    # x, y = l3.intersection(l4)
-    # plt.plot(x, y, 'o')
-    # x, y = l3.intersection(l3)
-    # plt.plot(x, y, 'o')
+    for la in [l1, l2, l3, l4]:
+        for lb in [l1, l2, l3, l4]:
+            try:
+                x, y = la.intersection(lb)
+            except TypeError:
+                continue
+            plt.plot(x, y, 'o')
     
     plt.show()
