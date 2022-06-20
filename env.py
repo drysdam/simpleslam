@@ -107,13 +107,28 @@ class Segment(Line):
         ax.plot(x, y)
 
     def intersection(self, l2):
-        x, y = Line.intersection(self, l2)
-        print('is ', x, y, ' inside of ', self.xy1, self.xy2)
+        try:
+            x, y = Line.intersection(self, l2)
+        except TypeError:
+            return None
+
         if (x < min(self.xy1[0], self.xy2[0])
             or x > max(self.xy1[0], self.xy2[0])
             or y < min(self.xy1[1], self.xy2[1])
             or y > max(self.xy1[1], self.xy2[1])):
             return None
+
+        try:
+            l2xy1, l2xy2 = l2.xy1, l2.xy2
+        except AttributeError:
+            return np.array([x, y])
+
+        if (x < min(l2xy1[0], l2xy2[0])
+            or x > max(l2xy1[0], l2xy2[0])
+            or y < min(l2xy1[1], l2xy2[1])
+            or y > max(l2xy1[1], l2xy2[1])):
+            return None
+        
         return np.array([x, y])
         
 if __name__ == '__main__':
