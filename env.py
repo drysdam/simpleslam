@@ -59,18 +59,15 @@ if __name__ == '__main__':
 
     # y = 1x + 1
     l1 = Line(1, -1, 1)
-    l1.graph(ax=ax)
     # y = -1x + 1
     l2 = Line(-1, -1, 1)
-    l2.graph(ax=ax)
     # y = 3
     l3 = Line(0, 1, -3)
-    l3.graph(ax=ax)
     # x = 5
     l4 = Line(1, 0, -5)
-    l4.graph(ax=ax)
 
     for la in [l1, l2, l3, l4]:
+        la.graph(size=11, ax=ax)
         for lb in [l1, l2, l3, l4]:
             try:
                 x, y = la.intersection(lb)
