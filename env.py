@@ -105,6 +105,16 @@ class Segment(Line):
         if ax == None:
             fig, ax = plt.subplots()
         ax.plot(x, y)
+
+    def intersection(self, l2):
+        x, y = Line.intersection(self, l2)
+        print('is ', x, y, ' inside of ', self.xy1, self.xy2)
+        if (x < min(self.xy1[0], self.xy2[0])
+            or x > max(self.xy1[0], self.xy2[0])
+            or y < min(self.xy1[1], self.xy2[1])
+            or y > max(self.xy1[1], self.xy2[1])):
+            return None
+        return np.array([x, y])
         
 if __name__ == '__main__':
     fig, ax = plt.subplots()
@@ -128,10 +138,14 @@ if __name__ == '__main__':
             plt.plot(x, y, 'o')
 
     s1 = Segment((-10,40), (10,40))
-    s1.graph(ax=ax)
-    s2 = Segment((5,30), (5,50))
-    s2.graph(ax=ax)
-    x, y = s1.intersection(s2)
-    plt.plot(x, y, 'o')
+    s2 = Segment((5,10), (5,20))
+    for sa in [s1, s2]:
+        sa.graph(ax=ax)
+        for sb in [s1, s2]:
+            try:
+                x, y = sa.intersection(sb)
+            except TypeError:
+                continue
+            plt.plot(x, y, 'o')
     
     plt.show()
