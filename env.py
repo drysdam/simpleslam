@@ -70,10 +70,15 @@ class Segment(Line):
         x1,y1 = xy1
         x2,y2 = xy2
         # (x1, y1) ... (x2, y2)
+
         try:
             m = (y2 - y1)/(x2 - x1)
         except ZeroDivisionError:
-            pass
+            # B = 0
+            # AX + C = 0
+            # X = -C/A
+            return [1, 0, -1*x1]
+        
         # by similar triangles
         # (y2-b)/(x2-0) = (y2-y1)/(x2-x1) = m
         # b = y2 - mx2
@@ -124,7 +129,7 @@ if __name__ == '__main__':
 
     s1 = Segment((-10,40), (10,40))
     s1.graph(ax=ax)
-    s2 = Segment((4,30), (5,50))
+    s2 = Segment((5,30), (5,50))
     s2.graph(ax=ax)
     x, y = s1.intersection(s2)
     plt.plot(x, y, 'o')
