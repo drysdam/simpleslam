@@ -12,7 +12,7 @@ class Line():
     def show(self):
         print(self.params)
 
-    def graph(self, ax=None):
+    def graph(self, size=201, ax=None):
         # ax + by + c = 0
         # -by = ax + c
         # y = -(a/b)x - c/b
@@ -21,10 +21,10 @@ class Line():
             if self.params[0] == 0:
                 raise "this is not a line"
             # xa + c = 0
-            x = [-1*self.params[2]/self.params[0]] * np.ones(100)
-            y = np.linspace(1, 10, 100)
+            x = [-1*self.params[2]/self.params[0]] * np.ones(size)
+            y = np.linspace(-1*(size-1)/2.0, (size-1)/2.0, size)
         else:
-            x = np.linspace(1, 10, 100)
+            x = np.linspace(-1*(size-1)/2.0, (size-1)/2.0, 201)
             y = -1*self.params[0]/self.params[1] * x - self.params[2]/self.params[1]
 
         if ax == None:
@@ -46,24 +46,29 @@ class Line():
             return None
 
         return np.array([num1/float(denom), num2/float(denom)])
-        print('here')
-        
+
+def Segment(Line):
+    def __init__(self, a, b, c, xy1, xy2):
+        super()
+        self.xy1 = np.array(xy1)
+        self.xy2 = np.array(xy2)
+
         
 if __name__ == '__main__':
     fig, ax = plt.subplots()
 
     # y = 1x + 1
     l1 = Line(1, -1, 1)
-    l1.graph(ax)
+    l1.graph(ax=ax)
     # y = -1x + 1
     l2 = Line(-1, -1, 1)
-    l2.graph(ax)
+    l2.graph(ax=ax)
     # y = 3
     l3 = Line(0, 1, -3)
-    l3.graph(ax)
+    l3.graph(ax=ax)
     # x = 5
     l4 = Line(1, 0, -5)
-    l4.graph(ax)
+    l4.graph(ax=ax)
 
     for la in [l1, l2, l3, l4]:
         for lb in [l1, l2, l3, l4]:
