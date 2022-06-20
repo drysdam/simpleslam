@@ -154,14 +154,5 @@ if __name__ == '__main__':
             except TypeError:
                 continue
             plt.plot(x, y, 'o')
-
-    # for sa in [s1, s2]:
-    #     sa.graph(ax=ax)
-    #     for sb in [s1, s2]:
-    #         try:
-    #             x, y = sa.intersection(sb)
-    #         except TypeError:
-    #             continue
-    #         plt.plot(x, y, 'o')
     
     plt.show()
