@@ -4,6 +4,18 @@ import matplotlib.pyplot as plt
 import pygame
 import sys
 
+def float_gcd(a, b, rtol = 1e-05, atol = 1e-08):
+    t = min(abs(a), abs(b))
+    while abs(b) > rtol * t + atol:
+        a, b = b, a % b
+    return a
+
+# print(float_gcd(100, 10))
+# print(float_gcd(100, 10.1))
+# print(float_gcd(100, 11.0))
+# print(float_gcd(100, 2.5))
+# sys.exit(0)
+
 class Line():
     def __init__(self, a, b, c):
         # ax + by + c = 0
@@ -51,8 +63,32 @@ class Segment(Line):
     def __init__(self, xy1, xy2):
         self.xy1 = xy1
         self.xy2 = xy2
-        self.params = np.array([])
 
+        self.params = np.array(self._convert2params(xy1, xy2))
+
+    def _convert2params(self, xy1, xy2):
+        x1,y1 = xy1
+        x2,y2 = xy2
+        # (x1, y1) ... (x2, y2)
+        try:
+            m = (y2 - y1)/(x2 - x1)
+        except ZeroDivisionError:
+            pass
+        # by similar triangles
+        # (y2-b)/(x2-0) = (y2-y1)/(x2-x1) = m
+        # b = y2 - mx2
+        b = y2 - m * x2
+        
+        # Ax + By + C = 0
+        # -By = Ax + C
+        # y = -(A/B)x - C/B
+        # m = -(A/B)
+        # b = -(C/B)
+        B = float_gcd(m, b)
+        A = -1*m*B
+        C = -1*b*B
+        return [A, B, C]
+        
     def graph(self, size=201, ax=None):
         x = np.linspace(min(self.xy1[0], self.xy2[0]),
                         max(self.xy1[0], self.xy2[0]),
@@ -88,5 +124,9 @@ if __name__ == '__main__':
 
     s1 = Segment((-10,40), (10,40))
     s1.graph(ax=ax)
-            
+    s2 = Segment((4,30), (5,50))
+    s2.graph(ax=ax)
+    x, y = s1.intersection(s2)
+    plt.plot(x, y, 'o')
+    
     plt.show()
