@@ -47,32 +47,46 @@ class Line():
 
         return np.array([num1/float(denom), num2/float(denom)])
 
-def Segment(Line):
-    def __init__(self, a, b, c, xy1, xy2):
-        super()
-        self.xy1 = np.array(xy1)
-        self.xy2 = np.array(xy2)
+class Segment(Line):
+    def __init__(self, xy1, xy2):
+        self.xy1 = xy1
+        self.xy2 = xy2
+        self.params = np.array([])
 
+    def graph(self, size=201, ax=None):
+        x = np.linspace(min(self.xy1[0], self.xy2[0]),
+                        max(self.xy1[0], self.xy2[0]),
+                        size)
+        y = np.linspace(min(self.xy1[1], self.xy2[1]),
+                        max(self.xy1[1], self.xy2[1]),
+                        size)
+
+        if ax == None:
+            fig, ax = plt.subplots()
+        ax.plot(x, y)
         
 if __name__ == '__main__':
     fig, ax = plt.subplots()
 
-    # y = 1x + 1
-    l1 = Line(1, -1, 1)
-    # y = -1x + 1
-    l2 = Line(-1, -1, 1)
-    # y = 3
-    l3 = Line(0, 1, -3)
-    # x = 5
-    l4 = Line(1, 0, -5)
+    # y = 1x + 10
+    l1 = Line(1, -1, 10)
+    # y = -1x + 10
+    l2 = Line(-1, -1, 10)
+    # y = 30
+    l3 = Line(0, 1, -30)
+    # x = 50
+    l4 = Line(1, 0, -50)
 
     for la in [l1, l2, l3, l4]:
-        la.graph(size=11, ax=ax)
+        la.graph(size=101, ax=ax)
         for lb in [l1, l2, l3, l4]:
             try:
                 x, y = la.intersection(lb)
             except TypeError:
                 continue
             plt.plot(x, y, 'o')
-    
+
+    s1 = Segment((-10,40), (10,40))
+    s1.graph(ax=ax)
+            
     plt.show()
