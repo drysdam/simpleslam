@@ -6,18 +6,27 @@ import sys
 
 class Line():
     def __init__(self, a, b, c):
-        # xa + by + c = 0
+        # ax + by + c = 0
         self.params = np.array([a, b, c])
 
     def show(self):
         print(self.params)
 
     def graph(self, ax=None):
-        # xa + by + c = 0
-        # -by = xa + c
+        # ax + by + c = 0
+        # -by = ax + c
         # y = -(a/b)x - c/b
-        x = np.linspace(1, 10, 100)
-        y = -1*self.params[0]/self.params[1] * x - self.params[2]/self.params[1]
+
+        if self.params[1] == 0:
+            if self.params[0] == 0:
+                raise "this is not a line"
+            # xa + c = 0
+            x = [-1*self.params[2]/self.params[0]] * np.ones(100)
+            y = np.linspace(1, 10, 100)
+        else:
+            x = np.linspace(1, 10, 100)
+            y = -1*self.params[0]/self.params[1] * x - self.params[2]/self.params[1]
+
         if ax == None:
             fig, ax = plt.subplots()
         ax.plot(x, y)
