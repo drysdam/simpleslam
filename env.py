@@ -17,27 +17,28 @@ def float_gcd(a, b, rtol = 1e-05, atol = 1e-08):
 # sys.exit(0)
 
 class Line():
-    def __init__(self, a, b, c):
-        # ax + by + c = 0
-        self.params = np.array([a, b, c])
+    def __init__(self, A, B, C):
+        # Ax + By + C = 0
+        self.params = np.array([A, B, C])
 
     def show(self):
         print(self.params)
 
     def graph(self, size=201, ax=None):
-        # ax + by + c = 0
-        # -by = ax + c
-        # y = -(a/b)x - c/b
+        # Ax + By + C = 0
+        # -By = Ax + C
+        # y = -(A/B)x - C/B
 
-        if self.params[1] == 0:
-            if self.params[0] == 0:
+        A, B, C = self.params
+        if B == 0:
+            if A == 0:
                 raise "this is not a line"
-            # xa + c = 0
-            x = [-1*self.params[2]/self.params[0]] * np.ones(size)
+            # Ax + C = 0
+            x = [-1*C/A] * np.ones(size)
             y = np.linspace(-1*(size-1)/2.0, (size-1)/2.0, size)
         else:
             x = np.linspace(-1*(size-1)/2.0, (size-1)/2.0, 201)
-            y = -1*self.params[0]/self.params[1] * x - self.params[2]/self.params[1]
+            y = -1*A/B * x - C/B
 
         if ax == None:
             fig, ax = plt.subplots()
@@ -49,12 +50,12 @@ class Line():
     def intersection(self, l2):
         # https://www.cuemath.com/geometry/intersection-of-two-lines/
         # I bet linear algebra would actually be faster...
-        # ((b1c2 - b2c1)/(a1b2 - a2b1), (c1a2 - c2a1)/(a1b2 - a2b1))
-        a1, b1, c1 = self.params
-        a2, b2, c2 = l2.params
-        num1 = b1*c2 - b2*c1
-        num2 = c1*a2 - c2*a1
-        denom = a1*b2 - a2*b1
+        # ((B1C2 - B2C1)/(A1B2 - A2B1), (C1A2 - C2A1)/(A1B2 - A2B1))
+        A1, B1, C1 = self.params
+        A2, B2, C2 = l2.params
+        num1 = B1*C2 - B2*C1
+        num2 = C1*A2 - C2*A1
+        denom = A1*B2 - A2*B1
 
         # lines are parallel
         if denom == 0:
