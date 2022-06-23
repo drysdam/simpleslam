@@ -98,27 +98,38 @@ class Ray(Line):
     def __init__(self, xyorigin, angle):
         self.xy = xyorigin
         self.angle = angle
-        
+        self.minx = None
+        self.maxx = None
+        self.miny = None
+        self.maxy = None
         
         x1, y1 = xyorigin
         if angle < 90 or angle > 270:
-            print('case 1')
             x2 = x1 + 100
             y2 = y1 + (x2-x1) * np.tan(np.deg2rad(angle))
-            print(x1, y1)
-            print(x2, y2)
+            self.minx = x1
+            if angle < 90:
+                self.miny = y1
+            else:
+                self.maxy = y1
         elif angle > 90 and angle < 270:
-            print('case 2')
             x2 = x1 - 100
             y2 = y1 + (x2-x1) * np.tan(np.deg2rad(angle))
+            self.maxx = x1
+            if angle <= 180:
+                self.miny = y1
+            else:
+                self.maxy = y1
         elif angle == 90:
-            print('case 3')
             x2 = x1
             y2 = y1 + 100
+            self.minx = x1
+            self.miny = y1
         elif angle == 270:
-            print('case 4')
             x2 = x1
             y2 = y1 - 100
+            self.minx = x1
+            self.maxy = y1
         else:
             raise 'what'
 
@@ -191,7 +202,7 @@ if __name__ == '__main__':
     #             continue
     #         plt.plot(x, y, 'o')
 
-    r1 = Ray([0, 0], 270+1)
+    r1 = Ray([10, 0], 45)
     r1.graph(size=101, ax=ax)
     
     ax.set_ylim(-100,100)
