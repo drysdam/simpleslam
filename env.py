@@ -98,46 +98,48 @@ class Ray(Line):
     def __init__(self, xyorigin, angle):
         self.xy = xyorigin
         self.angle = angle
-        self.minx = None
-        self.maxx = None
-        self.miny = None
-        self.maxy = None
+
+        if self.angle <= 90 or self.angle >= 270:
+            self.xdir = 1
+        else:
+            self.xdir = -1
+        if self.angle > 180:
+            self.ydir = -1
+        else:
+            self.ydir = 1
         
         x1, y1 = xyorigin
-        if angle < 90 or angle > 270:
+        if self.angle < 90 or self.angle > 270:
             x2 = x1 + 100
-            y2 = y1 + (x2-x1) * np.tan(np.deg2rad(angle))
-            self.minx = x1
-            if angle < 90:
-                self.miny = y1
-            else:
-                self.maxy = y1
-        elif angle > 90 and angle < 270:
+            y2 = y1 + (x2-x1) * np.tan(np.deg2rad(self.angle))
+        elif self.angle > 90 and self.angle < 270:
             x2 = x1 - 100
-            y2 = y1 + (x2-x1) * np.tan(np.deg2rad(angle))
-            self.maxx = x1
-            if angle <= 180:
-                self.miny = y1
-            else:
-                self.maxy = y1
-        elif angle == 90:
+            y2 = y1 + (x2-x1) * np.tan(np.deg2rad(self.angle))
+        elif self.angle == 90:
             x2 = x1
             y2 = y1 + 100
-            self.minx = x1
-            self.miny = y1
-        elif angle == 270:
+        elif self.angle == 270:
             x2 = x1
             y2 = y1 - 100
-            self.minx = x1
-            self.maxy = y1
         else:
             raise 'what'
 
         self.params = np.array(points2general(xyorigin, [x2,y2]))
 
     def graph(self, size=101, ax=None):
-        x = self.xy[0] + np.linspace(-1*(size-1)/2.0, (size-1)/2.0, 201)
-        y = np.tan(np.deg2rad(self.angle)) * x
+        if self.angle == 90 or self.angle == 270:
+            if self.ydir == 1:
+                y = self.xy[1] + np.linspace(0, size, size)
+            else:
+                y = self.xy[1] + np.linspace(-size, 0, size)
+            x = 1/np.tan(np.deg2rad(self.angle)) * y
+        else:
+            if self.xdir == 1:
+                x = self.xy[0] + np.linspace(0, size, size)
+            else:
+                x = self.xy[0] + np.linspace(-size, 0, size)
+            y = np.tan(np.deg2rad(self.angle)) * x
+
         ax.plot(x, y)
         
 class Segment(Line):
@@ -202,8 +204,14 @@ if __name__ == '__main__':
     #             continue
     #         plt.plot(x, y, 'o')
 
-    r1 = Ray([10, 0], 45)
+    r1 = Ray([0, 0], 0)
     r1.graph(size=101, ax=ax)
+    r2 = Ray([0, 0], 90)
+    r2.graph(size=101, ax=ax)
+    r3 = Ray([0, 0], 180)
+    r3.graph(size=101, ax=ax)
+    r4 = Ray([0, 0], 270)
+    r4.graph(size=101, ax=ax)
     
     ax.set_ylim(-100,100)
     ax.set_xlim(-100,100)
