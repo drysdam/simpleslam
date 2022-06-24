@@ -97,7 +97,7 @@ class Line():
 class Ray(Line):
     def __init__(self, xyorigin, angle):
         self.xy = xyorigin
-        self.angle = angle
+        self.angle = np.fmod(angle+360, 360)
 
         if self.angle <= 90 or self.angle >= 270:
             self.xdir = 1
@@ -111,10 +111,10 @@ class Ray(Line):
         x1, y1 = xyorigin
         if self.angle < 90 or self.angle > 270:
             x2 = x1 + 100
-            y2 = y1 + (x2-x1) * np.tan(np.deg2rad(self.angle))
+            y2 = y1 + x2 * np.tan(np.deg2rad(self.angle))
         elif self.angle > 90 and self.angle < 270:
             x2 = x1 - 100
-            y2 = y1 + (x2-x1) * np.tan(np.deg2rad(self.angle))
+            y2 = y1 + x2 * np.tan(np.deg2rad(self.angle))
         elif self.angle == 90:
             x2 = x1
             y2 = y1 + 100
@@ -142,6 +142,18 @@ class Ray(Line):
 
         ax.plot(x, y)
         
+    def inbounds(self, xy):
+        x, y = xy
+        if self.xdir == 1 and x < self.xy[0]:
+            return False
+        if self.xdir == -1 and x > self.xy[0]:
+            return False
+        if self.ydir == 1 and y < self.xy[1]:
+            return False
+        if self.ydir == -1 and y > self.xy[1]:
+            return False
+        return True
+
 class Segment(Line):
     def __init__(self, xy1, xy2):
         self.xy1 = xy1
@@ -183,36 +195,32 @@ class Segment(Line):
 if __name__ == '__main__':
     fig, ax = plt.subplots()
 
-    # # y = 1x + 10
-    # l1 = Line(1, -1, 10)
-    # # y = -1x + 10
-    # l2 = Line(-1, -1, 10)
-    # # y = 30
-    # l3 = Line(0, 1, -30)
-    # # x = 50
-    # l4 = Line(1, 0, -50)
-
-    # s1 = Segment((-10,40), (10,40))
-    # s2 = Segment((5,10), (5,20))
-
-    # for la in [l1, l2, l3, l4, s1, s2]:
-    #     la.graph(size=101, ax=ax)
-    #     for lb in [l1, l2, l3, l4, s1, s2]:
-    #         try:
-    #             x, y = la.intersection(lb)
-    #         except TypeError:
-    #             continue
-    #         plt.plot(x, y, 'o')
-
-    r1 = Ray([0, 0], 0)
-    r1.graph(size=101, ax=ax)
-    r2 = Ray([0, 0], 90)
-    r2.graph(size=101, ax=ax)
-    r3 = Ray([0, 0], 180)
-    r3.graph(size=101, ax=ax)
-    r4 = Ray([0, 0], 270)
-    r4.graph(size=101, ax=ax)
+    ls = []
     
+    # # y = 1x + 10
+    # ls.append(Line(1, -1, 10))
+    # # y = -1x + 10
+    # ls.append(Line(-1, -1, 10))
+    # # y = 30
+    # ls.append(Line(0, 1, -30))
+    # x = 50
+    ls.append(Line(1, 0, -50))
+
+    # ls.append(Segment((-10,40), (10,40)))
+    # ls.append(Segment((5,10), (5,20)))
+
+    ls.append(Ray([10, 0], 60))
+    #ls.append(Ray([10, 10], 350))
+
+    for la in ls:
+        la.graph(size=101, ax=ax)
+        for lb in ls:
+            try:
+                x, y = la.intersection(lb)
+            except TypeError:
+                continue
+            plt.plot(x, y, 'o')
+
     ax.set_ylim(-100,100)
     ax.set_xlim(-100,100)
     plt.show()
