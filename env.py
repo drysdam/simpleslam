@@ -47,6 +47,7 @@ class Line():
     def __init__(self, A, B, C):
         # Ax + By + C = 0
         self.params = np.array([A, B, C])
+        # print('Line params:', self.params)
 
     def show(self):
         print(self.params)
@@ -80,6 +81,8 @@ class Line():
         # ((B1C2 - B2C1)/(A1B2 - A2B1), (C1A2 - C2A1)/(A1B2 - A2B1))
         A1, B1, C1 = self.params
         A2, B2, C2 = l2.params
+        # print('My params:', self.params)
+        # print('Their params:', l2.params)
         num1 = B1*C2 - B2*C1
         num2 = C1*A2 - C2*A1
         denom = A1*B2 - A2*B1
@@ -109,11 +112,13 @@ class Ray(Line):
         
         x1, y1 = xyorigin
         if self.angle < 90 or self.angle > 270:
-            x2 = x1 + 100
+            x2 = 100
             y2 = y1 + x2 * np.tan(np.deg2rad(self.angle))
+            x2 += x1
         elif self.angle > 90 and self.angle < 270:
-            x2 = x1 - 100
+            x2 = - 100
             y2 = y1 + x2 * np.tan(np.deg2rad(self.angle))
+            x2 += x1
         elif self.angle == 90:
             x2 = x1
             y2 = y1 + 100
@@ -124,6 +129,8 @@ class Ray(Line):
             raise 'what'
 
         self.params = np.array(points2general(xyorigin, [x2,y2]))
+        # print('Ray points:', xyorigin + [x2, y2])
+        # print('Ray params:', self.params)
         
     def graph(self, size=101, ax=None):
         if self.angle == 90 or self.angle == 270:
@@ -231,24 +238,27 @@ if __name__ == '__main__':
     # ls.append(Line(0, 1, -30))
     # x = 50
     ls.append(Line(1, 0, -50))
-    print(ls[0].params)
     
     # ls.append(Segment((-10,40), (10,40)))
     # ls.append(Segment((5,10), (5,20)))
 
+    #ls.append(Ray([0, 0], 45))
+    #ls.append(Line(-1, 1, 0))
     ls.append(Ray([10, 0], 45))
-    print(ls[-1].params)
+    #ls.append(Line(1.21, -1.1, -12.1))
     #ls.append(Ray([10, 10], 350))
 
     for la in ls:
         la.graph(size=101, ax=ax)
-        for lb in ls:
+        for lb in ls[1:]:
+            if lb == la:
+                continue
             try:
                 x, y = la.intersection(lb)
-                print(x, y)
+                #print(x, y)
             except TypeError:
                 continue
-            plt.plot(x, y, 'o')
+            ax.plot(x, y, 'o')
 
     ax.set_ylim(-100,100)
     ax.set_xlim(-100,100)
