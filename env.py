@@ -238,6 +238,7 @@ if __name__ == '__main__':
     # ls.append(Line(0, 1, -30))
     # x = 50
     ls.append(Line(1, 0, -50))
+    ls.append(Line(1, 0, 50))
     
     # ls.append(Segment((-10,40), (10,40)))
     # ls.append(Segment((5,10), (5,20)))
@@ -245,6 +246,9 @@ if __name__ == '__main__':
     #ls.append(Ray([0, 0], 45))
     #ls.append(Line(-1, 1, 0))
     ls.append(Ray([10, 0], 45))
+    ls.append(Ray([10, 0], -45))
+    ls.append(Ray([10, 0], 180+45))
+    ls.append(Ray([10, 0], 180+-45))
     #ls.append(Line(1.21, -1.1, -12.1))
     #ls.append(Ray([10, 10], 350))
 
