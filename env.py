@@ -224,45 +224,69 @@ class Segment(Line):
         if self.inbounds([x, y]) and l2.inbounds([x, y]):
             return np.array([x, y])
         return None
-        
-if __name__ == '__main__':
+
+class Map():
+    def __init__(self, walls):
+        self.walls = walls
+
+    def graph(self, ax, intersections=False):
+        for i, wall in enumerate(self.walls):
+            wall.graph(size=101, ax=ax)
+            if intersections:
+                for wall2 in self.walls[i+1:]:
+                    try:
+                        x, y = wall.intersection(wall2)
+                        #print(x, y)
+                    except TypeError:
+                        continue
+                    ax.plot(x, y, 'o')
+                
+if __name__ == '__main__':    
     fig, ax = plt.subplots()
 
-    ls = []
+    s1 = Segment((-50, 50), (50, 50))
+    s2 = Segment((50, 50), (50, -50))
+    s3 = Segment((50, -50), (-50, -50))
+    s4 = Segment((-50, -50), (-50, 50))
+    walls = [s1, s2, s3, s4]
+    mp = Map(walls)
+    mp.graph(ax, True)
     
-    # # y = 1x + 10
-    # ls.append(Line(1, -1, 10))
-    # # y = -1x + 10
-    # ls.append(Line(-1, -1, 10))
-    # # y = 30
-    # ls.append(Line(0, 1, -30))
-    # x = 50
-    ls.append(Line(1, 0, -50))
-    ls.append(Line(1, 0, 50))
+    # ls = []
     
-    # ls.append(Segment((-10,40), (10,40)))
-    # ls.append(Segment((5,10), (5,20)))
+    # # # y = 1x + 10
+    # # ls.append(Line(1, -1, 10))
+    # # # y = -1x + 10
+    # # ls.append(Line(-1, -1, 10))
+    # # # y = 30
+    # # ls.append(Line(0, 1, -30))
+    # # x = 50
+    # ls.append(Line(1, 0, -50))
+    # ls.append(Line(1, 0, 50))
+    
+    # # ls.append(Segment((-10,40), (10,40)))
+    # # ls.append(Segment((5,10), (5,20)))
 
-    #ls.append(Ray([0, 0], 45))
-    #ls.append(Line(-1, 1, 0))
-    ls.append(Ray([10, 0], 45))
-    ls.append(Ray([10, 0], -45))
-    ls.append(Ray([10, 0], 180+45))
-    ls.append(Ray([10, 0], 180+-45))
-    #ls.append(Line(1.21, -1.1, -12.1))
-    #ls.append(Ray([10, 10], 350))
+    # #ls.append(Ray([0, 0], 45))
+    # #ls.append(Line(-1, 1, 0))
+    # ls.append(Ray([10, 0], 45))
+    # ls.append(Ray([10, 0], -45))
+    # ls.append(Ray([10, 0], 180+45))
+    # ls.append(Ray([10, 0], 180+-45))
+    # #ls.append(Line(1.21, -1.1, -12.1))
+    # #ls.append(Ray([10, 10], 350))
 
-    for la in ls:
-        la.graph(size=101, ax=ax)
-        for lb in ls[1:]:
-            if lb == la:
-                continue
-            try:
-                x, y = la.intersection(lb)
-                #print(x, y)
-            except TypeError:
-                continue
-            ax.plot(x, y, 'o')
+    # for la in ls:
+    #     la.graph(size=101, ax=ax)
+    #     for lb in ls[1:]:
+    #         if lb == la:
+    #             continue
+    #         try:
+    #             x, y = la.intersection(lb)
+    #             #print(x, y)
+    #         except TypeError:
+    #             continue
+    #         ax.plot(x, y, 'o')
 
     ax.set_ylim(-100,100)
     ax.set_xlim(-100,100)
