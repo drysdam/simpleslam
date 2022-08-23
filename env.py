@@ -89,6 +89,7 @@ class Line():
 
         # lines are parallel
         if denom == 0:
+            print('denom:', denom)
             return None
 
         xy = [num1/float(denom), num2/float(denom)]
@@ -112,25 +113,29 @@ class Ray(Line):
         
         x1, y1 = xyorigin
         if self.angle < 90 or self.angle > 270:
+            print('case pos x')
             x2 = 100
             y2 = y1 + x2 * np.tan(np.deg2rad(self.angle))
             x2 += x1
         elif self.angle > 90 and self.angle < 270:
+            print('case neg x')
             x2 = - 100
             y2 = y1 + x2 * np.tan(np.deg2rad(self.angle))
             x2 += x1
         elif self.angle == 90:
+            print('case vert up')
             x2 = x1
             y2 = y1 + 100
         elif self.angle == 270:
+            print('case vert down')
             x2 = x1
             y2 = y1 - 100
         else:
             raise 'what'
 
         self.params = np.array(points2general(xyorigin, [x2,y2]))
-        # print('Ray points:', xyorigin + [x2, y2])
-        # print('Ray params:', self.params)
+        print('Ray points:', xyorigin + [x2, y2])
+        print('Ray params:', self.params)
         
     def graph(self, size=101, ax=None):
         if self.angle == 90 or self.angle == 270:
@@ -228,8 +233,10 @@ class Segment(Line):
 class Map():
     def __init__(self, walls):
         self.walls = walls
+        self.ax = None
 
     def graph(self, ax, intersections=False):
+        self.ax = ax
         for i, wall in enumerate(self.walls):
             wall.graph(size=101, ax=ax)
             if intersections:
@@ -240,7 +247,26 @@ class Map():
                     except TypeError:
                         continue
                     ax.plot(x, y, 'o')
-                
+
+    def probe(self, position, angle):
+        ray = Ray(position, angle)
+        if not self.ax == None:
+            ray.graph(size=101, ax=ax)
+        x0,y0 = position
+        minrng = None
+        for wall in self.walls:
+            try:
+                x, y = ray.intersection(wall)
+                print(x, y)
+            except TypeError:
+                continue
+            rng = np.sqrt((x0 - x)**2 + (y0 - y)**2)
+            print(rng)
+            if minrng == None or rng < minrng:
+                minrng = rng
+
+        return minrng
+    
 if __name__ == '__main__':    
     fig, ax = plt.subplots()
 
@@ -251,6 +277,9 @@ if __name__ == '__main__':
     walls = [s1, s2, s3, s4]
     mp = Map(walls)
     mp.graph(ax, True)
+
+    print(mp.probe([0, 0], 0))
+
     
     # ls = []
     
