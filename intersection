@@ -69,3 +69,12 @@ l2 = [1, 1, -1]
 print('l1', l1)
 print('l2', l2)
 print('int', intersection(l1, l2))
+
+
+#   y = (-A/B)x + -C/B
+#   y = 
+l1 = [1, 0, -50]
+l2 = [1.21, -1.1, -12.1]
+print('l1', l1)
+print('l2', l2)
+print('int', intersection(l1, l2))
