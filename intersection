@@ -38,19 +38,34 @@ def intersection(l1, l2):
 # at (0, 0)
 l1 = [-1, 1, 0]
 l2 = [1, 1, 0]
-print(l1)
-print(l2)
-print(intersection(l1, l2))
+print('l1', l1)
+print('l2', l2)
+print('int', intersection(l1, l2))
       
 # now move both lines up by 1
 #
+#   y = (-A/B)x + -C/B
 #   A=-1, B=1, C=-1  -> m=1, b=1
 #   A=1, B=1, C=-1  -> m=-1, b=1 
 #
 # these two lines should obviously intersect
-# at (1, 1)....but nope.
+# at (0, 1)
 l1 = [-1, 1, -1]
 l2 = [1, 1, -1]
-print(l1)
-print(l2)
-print(intersection(l1, l2))
+print('l1', l1)
+print('l2', l2)
+print('int', intersection(l1, l2))
+
+# now move both original lines over by 1
+#
+#   y = (-A/B)x + -C/B
+#   A=-1, B=1, C=1  -> m=1, b=-1
+#   A=1, B=1, C=-1  -> m=-1, b=1 
+#
+# these two lines should obviously intersect
+# at (1, 0)
+l1 = [-1, 1, 1]
+l2 = [1, 1, -1]
+print('l1', l1)
+print('l2', l2)
+print('int', intersection(l1, l2))
