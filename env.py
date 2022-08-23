@@ -128,17 +128,17 @@ class Ray(Line):
     def graph(self, size=101, ax=None):
         if self.angle == 90 or self.angle == 270:
             if self.ydir == 1:
-                y = self.xy[1] + np.linspace(0, size, size)
+                y = np.linspace(0, size, size)
             else:
-                y = self.xy[1] + np.linspace(-size, 0, size)
+                y = np.linspace(-size, 0, size)
             x = 1/np.tan(np.deg2rad(self.angle)) * y
         else:
             if self.xdir == 1:
                 x = np.linspace(0, size, size)
             else:
-                x = self.xy[0] + np.linspace(-size, 0, size)
+                x = np.linspace(-size, 0, size)
             y = np.tan(np.deg2rad(self.angle)) * x
-        ax.plot(x + self.xy[0], y)
+        ax.plot(x + self.xy[0], y + self.xy[1])
         
     def inbounds(self, xy):
         x, y = xy
