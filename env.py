@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import numpy as np
 import matplotlib.pyplot as plt
-import pygame
 import sys
 
 def float_gcd(a, b, rtol = 1e-05, atol = 1e-08):
@@ -43,7 +42,7 @@ def points2general(xy1, xy2):
     A = -1*m*B
     C = -1*b*B
     return [A, B, C]
-        
+
 class Line():
     def __init__(self, A, B, C):
         # Ax + By + C = 0
@@ -125,7 +124,7 @@ class Ray(Line):
             raise 'what'
 
         self.params = np.array(points2general(xyorigin, [x2,y2]))
-
+        
     def graph(self, size=101, ax=None):
         if self.angle == 90 or self.angle == 270:
             if self.ydir == 1:
@@ -135,12 +134,11 @@ class Ray(Line):
             x = 1/np.tan(np.deg2rad(self.angle)) * y
         else:
             if self.xdir == 1:
-                x = self.xy[0] + np.linspace(0, size, size)
+                x = np.linspace(0, size, size)
             else:
                 x = self.xy[0] + np.linspace(-size, 0, size)
             y = np.tan(np.deg2rad(self.angle)) * x
-
-        ax.plot(x, y)
+        ax.plot(x + self.xy[0], y)
         
     def inbounds(self, xy):
         x, y = xy
@@ -153,6 +151,34 @@ class Ray(Line):
         if self.ydir == -1 and y > self.xy[1]:
             return False
         return True
+
+# l1params = points2general([-1,-1], [1, 1])
+# l1params = points2general([-1,0], [1, 2])
+# l1params = points2general([2,-2], [2, 2])
+# print(l1params)
+# l2params = points2general([-1,1], [1, -1])
+# l2params = points2general([-1,2], [1, 0])
+# l2params = points2general([0, 0], [2, 2])
+# print(l2params)
+# #sys.exit(0)
+
+# fig, ax = plt.subplots()
+# l1 = Line(*l1params)
+# l1.graph(size=101, ax=ax)
+# l2 = Line(*l2params)
+# l2 = Ray([1, 0], 45)
+# l2.graph(size=101, ax=ax)
+# try:
+#     x, y = l1.intersection(l2)
+#     print(x, y)
+#     plt.plot(x, y, 'o')
+# except TypeError:
+#     pass
+# ax.set_ylim(-3,3)
+# ax.set_xlim(-3,3)
+
+# plt.show()
+# sys.exit(0)
 
 class Segment(Line):
     def __init__(self, xy1, xy2):
@@ -205,11 +231,13 @@ if __name__ == '__main__':
     # ls.append(Line(0, 1, -30))
     # x = 50
     ls.append(Line(1, 0, -50))
-
+    print(ls[0].params)
+    
     # ls.append(Segment((-10,40), (10,40)))
     # ls.append(Segment((5,10), (5,20)))
 
-    ls.append(Ray([10, 0], 60))
+    ls.append(Ray([10, 0], 45))
+    print(ls[-1].params)
     #ls.append(Ray([10, 10], 350))
 
     for la in ls:
@@ -217,6 +245,7 @@ if __name__ == '__main__':
         for lb in ls:
             try:
                 x, y = la.intersection(lb)
+                print(x, y)
             except TypeError:
                 continue
             plt.plot(x, y, 'o')
