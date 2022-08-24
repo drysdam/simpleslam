@@ -6,6 +6,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
+def deg2dir(ang):
+    # 0 is up, 90 to the right
+    rad = np.deg2rad(ang)
+    s = np.sin(rad)
+    c = np.cos(rad)
+    dir2 = sg.Direction2(100*s, 100*c)
+    print(ang, rad, s, c, dir2)
+    return dir2
+    
 class Map():
     def __init__(self, polygon):
         self.pgon = polygon
@@ -19,7 +28,7 @@ class Map():
         # ray = sg.Ray2(sg.Point2(0, 0),
         #               sg.Point2(10, 0))
         origin = sg.Point2(0, 0)
-        ray = sg.Ray2(origin, sg.Direction2(100, ang))
+        ray = sg.Ray2(origin, deg2dir(angle))
         #sgdraw.draw(ray, display_range=100)
         mind = 1e10
         for edge in self.pgon.edges:
@@ -42,9 +51,8 @@ if __name__ == '__main__':
     mp = Map(pgon)
     mp.graph()
 
-    axp = fig.add_subplot(122, projection='polar')
-
     angs = range(0, 360)
+    #angs = [0, 45, 90]
     plotangs = []
     rngs = []
     for ang in angs:
@@ -56,8 +64,10 @@ if __name__ == '__main__':
         rngs.append(rng)
         #mp.graph()
 
-    print(plotangs)
-    print(rngs)
+    for ang, rng in zip(plotangs, rngs):
+        print(ang, rng)
+        
+    axp = fig.add_subplot(122, projection='polar')
     axp.plot(np.deg2rad(plotangs), rngs)
         
     ax.set_ylim(-100,100)
