@@ -15,7 +15,7 @@ def deg2dir(ang):
     print(ang, rad, s, c, dir2)
     return dir2
     
-class Map():
+class World():
     def __init__(self, polygon):
         self.pgon = polygon
         self.ax = None
@@ -50,8 +50,8 @@ if __name__ == '__main__':
                        sg.Point2(50, 50),
                        sg.Point2(50, -50),
                        sg.Point2(-50, -50)])
-    mp = Map(pgon)
-    mp.graph()
+    W = World(pgon)
+    W.graph()
 
     angs = range(0, 360, 1)
     #angs = [0, 45, 90]
@@ -59,7 +59,7 @@ if __name__ == '__main__':
     rngs = []
     for ang in angs:
         #ax.clear()
-        rng = mp.probe([0, 0], ang, noise=1.0, dropout=.15)
+        rng = W.probe([0, 0], ang, noise=1.0, dropout=.15)
         if rng == None:
             continue
         plotangs.append(ang)

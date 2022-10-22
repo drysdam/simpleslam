@@ -1,0 +1,28 @@
+2022-10-22
+
+Google "SLAM for dummies" for SLAM algorithm itself.
+
+Need the following objects for sim:
+
+  World: a place for the sim to occur inside of. this object contains
+         the true map of the space and also knows the true position of
+         the Robot. the Robot asks the World for measurements. the
+         World takes perfect measurements of the map based on the
+         Robot's true position (which the robot does not necessarily
+         know), then adds a (configurable) amount of noise.
+	 
+  Robot: has the ability to move around the World and also probe it
+         for data via lidar. initially has no idea where it is, but is
+         building a Map.
+
+  Map: contains the SLAM implementation and thus will build up
+       knowledge of the World and the Robot's position.
+
+
+
+  
+
+  
+
+
+
