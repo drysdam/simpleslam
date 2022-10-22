@@ -24,7 +24,7 @@ class Map():
         print(self.pgon)
         sgdraw.draw(self.pgon)
     
-    def probe(self, position, angle):
+    def probe(self, position, angle, noise=0, dropout=0):
         # ray = sg.Ray2(sg.Point2(0, 0),
         #               sg.Point2(10, 0))
         origin = sg.Point2(position[0], position[1])
@@ -38,7 +38,9 @@ class Map():
             d = np.sqrt(float((isct - origin).squared_length()))
             mind = min(mind, d)
 
-        return mind
+        if np.random.random(1) < dropout:
+            return None
+        return mind + noise*np.random.random(1)-noise/2.
     
 if __name__ == '__main__':    
     fig = plt.figure(figsize=(8,4))
@@ -51,13 +53,13 @@ if __name__ == '__main__':
     mp = Map(pgon)
     mp.graph()
 
-    angs = range(0, 360)
+    angs = range(0, 360, 1)
     #angs = [0, 45, 90]
     plotangs = []
     rngs = []
     for ang in angs:
         #ax.clear()
-        rng = mp.probe([0, -10], ang)
+        rng = mp.probe([0, 0], ang, noise=1.0, dropout=.15)
         if rng == None:
             continue
         plotangs.append(ang)
@@ -70,7 +72,8 @@ if __name__ == '__main__':
     axp = fig.add_subplot(122, projection='polar')
     axp.set_theta_direction(-1)
     axp.set_theta_offset(np.pi / 2.0)
-    axp.plot(np.deg2rad(plotangs), rngs)
+    axp.plot(np.deg2rad(plotangs), rngs,
+             '.', markersize=3)
         
     ax.set_ylim(-100,100)
     ax.set_xlim(-100,100)
