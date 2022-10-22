@@ -16,13 +16,13 @@ def deg2dir(ang):
     return dir2
     
 class World():
-    def __init__(self, polygon):
-        self.pgon = polygon
+    def __init__(self, polygonmap):
+        self.pgonmap = polygonmap
         self.ax = None
 
     def graph(self):
-        print(self.pgon)
-        sgdraw.draw(self.pgon)
+        print(self.pgonmap)
+        sgdraw.draw(self.pgonmap)
     
     def probe(self, position, angle, noise=0, dropout=0):
         # ray = sg.Ray2(sg.Point2(0, 0),
@@ -31,7 +31,7 @@ class World():
         ray = sg.Ray2(origin, deg2dir(angle))
         #sgdraw.draw(ray, display_range=100)
         mind = 1e10
-        for edge in self.pgon.edges:
+        for edge in self.pgonmap.edges:
             isct = sg.intersection(ray, edge)
             if isct == None:
                 continue
