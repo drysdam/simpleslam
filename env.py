@@ -27,7 +27,7 @@ class Map():
     def probe(self, position, angle):
         # ray = sg.Ray2(sg.Point2(0, 0),
         #               sg.Point2(10, 0))
-        origin = sg.Point2(0, 0)
+        origin = sg.Point2(position[0], position[1])
         ray = sg.Ray2(origin, deg2dir(angle))
         #sgdraw.draw(ray, display_range=100)
         mind = 1e10
@@ -57,7 +57,7 @@ if __name__ == '__main__':
     rngs = []
     for ang in angs:
         #ax.clear()
-        rng = mp.probe([0, 0], ang)
+        rng = mp.probe([0, -10], ang)
         if rng == None:
             continue
         plotangs.append(ang)
@@ -68,6 +68,8 @@ if __name__ == '__main__':
         print(ang, rng)
         
     axp = fig.add_subplot(122, projection='polar')
+    axp.set_theta_direction(-1)
+    axp.set_theta_offset(np.pi / 2.0)
     axp.plot(np.deg2rad(plotangs), rngs)
         
     ax.set_ylim(-100,100)
