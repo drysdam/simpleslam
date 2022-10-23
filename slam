@@ -39,7 +39,7 @@ class World():
 
     def robot_translate(self, dx, dy):
         poserrx = 2*self.poserrmax*np.random.random(1)-self.poserrmax/2.
-        poserry = 2*self.poserrmay*np.random.random(1)-self.poserrmay/2.
+        poserry = 2*self.poserrmax*np.random.random(1)-self.poserrmax/2.
         self.robotpos[0] = self.robotpos[0] + dx + poserrx
         self.robotpos[1] = self.robotpos[1] + dy + poserry
         
@@ -114,6 +114,9 @@ if __name__ == '__main__':
     W.graph()
 
     R = Robot(W, ax=axr)
+    R.lidarsweep(graph=True)
+    R.rotate(30)
+    R.translate(10, 0)
     R.lidarsweep(graph=True)
     
     # angs = range(0, 360, 1)
