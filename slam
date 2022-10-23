@@ -16,19 +16,38 @@ def deg2dir(ang):
     return dir2
     
 class World():
-    def __init__(self, polygonmap):
+    def __init__(self, polygonmap, ax = None):
+        # these should probably be properties of the Robot
+        self.angerrmax = .1
+        self.poserrmax = .1
+        self.lidardisterr = .1
+        self.lidardropoutfrac = .1
+        
         self.pgonmap = polygonmap
-        self.ax = None
+        self.ax = ax
+        self.robotpos = [0, 0]
+        self.robotang = 0
 
     def graph(self):
         print(self.pgonmap)
-        sgdraw.draw(self.pgonmap)
-    
-    def probe(self, position, angle, noise=0, dropout=0):
+        if not self.ax == None:
+            sgdraw.draw(self.pgonmap)
+
+    def robot_rotate(self, ang):
+        angerr = 2*self.angerrmax*np.random.random(1)-self.angerrmax/2.
+        self.robotang = np.fmod(self.robotang + ang + angerr, 360)
+
+    def robot_translate(self, dx, dy):
+        poserrx = 2*self.poserrmax*np.random.random(1)-self.poserrmax/2.
+        poserry = 2*self.poserrmay*np.random.random(1)-self.poserrmay/2.
+        self.robotpos[0] = self.robotpos[0] + dx + poserrx
+        self.robotpos[1] = self.robotpos[1] + dy + poserry
+        
+    def probe(self, scanangle):
         # ray = sg.Ray2(sg.Point2(0, 0),
         #               sg.Point2(10, 0))
-        origin = sg.Point2(position[0], position[1])
-        ray = sg.Ray2(origin, deg2dir(angle))
+        origin = sg.Point2(self.robotpos[0], self.robotpos[1])
+        ray = sg.Ray2(origin, deg2dir(self.robotang+scanangle))
         #sgdraw.draw(ray, display_range=100)
         mind = 1e10
         for edge in self.pgonmap.edges:
@@ -38,43 +57,87 @@ class World():
             d = np.sqrt(float((isct - origin).squared_length()))
             mind = min(mind, d)
 
-        if np.random.random(1) < dropout:
+        if np.random.random(1) < self.lidardropoutfrac:
             return None
-        return mind + noise*np.random.random(1)-noise/2.
+        return mind+self.lidardisterr*np.random.random(1)-self.lidardisterr/2.
+
+    
+class Robot():
+    def __init__(self, world, ax = None):
+        self.W = world
+        self.ax = ax
+        self.robotpos = [0, 0]
+        self.robotang = 0
+        
+    def rotate(self, theta):
+        self.robotang += theta
+        self.W.robot_rotate(theta)
+
+    def translate(self, dx, dy):
+        self.robotpos[0] += dx
+        self.robotpos[1] += dy
+        self.W.robot_translate(dx, dy)
+
+    def lidarsweep(self, graph=True):
+        angs = range(0, 360, 1)
+        angs2 = []
+        rngs = []
+        for ang in angs:
+            rng = W.probe(ang)
+            if rng == None:
+                continue
+            angs2.append(ang)
+            rngs.append(rng)
+            
+        self.ax.plot(np.deg2rad(angs2), rngs,
+                     '.', markersize=3)
+                
+class Map():
+    def __init(self):
+        pass
+    
     
 if __name__ == '__main__':    
-    fig = plt.figure(figsize=(8,4))
-    ax = fig.add_subplot(121)
+    figr = plt.figure(figsize=(8,4))
+    axr = figr.add_subplot(111, projection='polar')
+    axr.set_theta_direction(-1)
+    axr.set_theta_offset(np.pi / 2.0)
+
+    figw = plt.figure(figsize=(8,4))
+    axw = figw.add_subplot(111)
 
     pgon = sg.Polygon([sg.Point2(-50, 50),
                        sg.Point2(50, 50),
                        sg.Point2(50, -50),
                        sg.Point2(-50, -50)])
-    W = World(pgon)
+    W = World(pgon, ax=axw)
     W.graph()
 
-    angs = range(0, 360, 1)
-    #angs = [0, 45, 90]
-    plotangs = []
-    rngs = []
-    for ang in angs:
-        #ax.clear()
-        rng = W.probe([0, 0], ang, noise=1.0, dropout=.15)
-        if rng == None:
-            continue
-        plotangs.append(ang)
-        rngs.append(rng)
-        #mp.graph()
+    R = Robot(W, ax=axr)
+    R.lidarsweep(graph=True)
+    
+    # angs = range(0, 360, 1)
+    # #angs = [0, 45, 90]
+    # plotangs = []
+    # rngs = []
+    # for ang in angs:
+    #     #ax.clear()
+    #     rng = W.probe([0, 0], ang, noise=1.0, dropout=.15)
+    #     if rng == None:
+    #         continue
+    #     plotangs.append(ang)
+    #     rngs.append(rng)
+    #     #mp.graph()
 
-    for ang, rng in zip(plotangs, rngs):
-        print(ang, rng)
+    # for ang, rng in zip(plotangs, rngs):
+    #     print(ang, rng)
         
-    axp = fig.add_subplot(122, projection='polar')
-    axp.set_theta_direction(-1)
-    axp.set_theta_offset(np.pi / 2.0)
-    axp.plot(np.deg2rad(plotangs), rngs,
-             '.', markersize=3)
+    # axp = fig.add_subplot(122, projection='polar')
+    # axp.set_theta_direction(-1)
+    # axp.set_theta_offset(np.pi / 2.0)
+    # axp.plot(np.deg2rad(plotangs), rngs,
+    #          '.', markersize=3)
         
-    ax.set_ylim(-100,100)
-    ax.set_xlim(-100,100)
+    # ax.set_ylim(-100,100)
+    # ax.set_xlim(-100,100)
     plt.show()
