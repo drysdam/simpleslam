@@ -67,9 +67,8 @@ class World():
 
     
 class Robot():
-    def __init__(self, world, ax = None):
+    def __init__(self, world):
         self.W = world
-        self.ax = ax
         self.robotpos = [0, 0]
         self.robotang = 0
         
@@ -82,7 +81,7 @@ class Robot():
         self.robotpos[1] += dy
         self.W.robot_translate(dx, dy)
 
-    def lidarsweep(self, graph=True):
+    def lidarsweep(self):
         angs = range(0, 360, 1)
         angs2 = []
         rngs = []
@@ -96,10 +95,9 @@ class Robot():
             rngs.append(rng)
             xs.append(rng*np.cos(np.deg2rad(ang)))
             ys.append(rng*np.sin(np.deg2rad(ang)))
-            
-        # self.ax.plot(np.deg2rad(angs2), rngs,
-        #              '.', markersize=3)
-        self.ax.plot(xs, ys, '.', markersize=3)
+
+        return ([np.array(angs2), np.array(rngs)],
+                [np.array(xs), np.array(ys)])
                 
 class Map():
     def __init(self):
@@ -122,34 +120,12 @@ if __name__ == '__main__':
     W = World(pgon, ax=axw)
     W.graph()
 
-    R = Robot(W, ax=axr)
-    R.lidarsweep(graph=True)
+    R = Robot(W)
+    [angs, rngs], [xs, ys] = R.lidarsweep()
+    axr.plot(xs, ys, '.', markersize=3)
     for i in range(360):
         R.rotate(1)
-    R.lidarsweep(graph=True)
-    
-    # angs = range(0, 360, 1)
-    # #angs = [0, 45, 90]
-    # plotangs = []
-    # rngs = []
-    # for ang in angs:
-    #     #ax.clear()
-    #     rng = W.probe([0, 0], ang, noise=1.0, dropout=.15)
-    #     if rng == None:
-    #         continue
-    #     plotangs.append(ang)
-    #     rngs.append(rng)
-    #     #mp.graph()
+    [angs, rngs], [xs, ys] = R.lidarsweep()
+    axr.plot(xs, ys, '.', markersize=3)
 
-    # for ang, rng in zip(plotangs, rngs):
-    #     print(ang, rng)
-        
-    # axp = fig.add_subplot(122, projection='polar')
-    # axp.set_theta_direction(-1)
-    # axp.set_theta_offset(np.pi / 2.0)
-    # axp.plot(np.deg2rad(plotangs), rngs,
-    #          '.', markersize=3)
-        
-    # ax.set_ylim(-100,100)
-    # ax.set_xlim(-100,100)
     plt.show()
