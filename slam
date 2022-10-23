@@ -18,7 +18,7 @@ def deg2dir(ang):
 class World():
     def __init__(self, polygonmap, ax = None):
         # these should probably be properties of the Robot
-        self.angerrmax = .25
+        self.angerrmax = .1
         self.poserrmax = .1
         self.lidardisterr = .1
         self.lidardropoutfrac = .1
@@ -38,7 +38,6 @@ class World():
     def robot_rotate(self, ang):
         angerr = 2*self.angerrmax*(np.random.random() - .5)
         self.totalangerr += angerr
-        print(angerr, self.totalangerr)
         self.robotang = np.fmod(self.robotang + ang + angerr, 360)
 
     def robot_translate(self, dx, dy):
@@ -87,15 +86,20 @@ class Robot():
         angs = range(0, 360, 1)
         angs2 = []
         rngs = []
+        xs = []
+        ys = []
         for ang in angs:
             rng = W.probe(ang)
             if rng == None:
                 continue
             angs2.append(ang)
             rngs.append(rng)
+            xs.append(rng*np.cos(np.deg2rad(ang)))
+            ys.append(rng*np.sin(np.deg2rad(ang)))
             
-        self.ax.plot(np.deg2rad(angs2), rngs,
-                     '.', markersize=3)
+        # self.ax.plot(np.deg2rad(angs2), rngs,
+        #              '.', markersize=3)
+        self.ax.plot(xs, ys, '.', markersize=3)
                 
 class Map():
     def __init(self):
@@ -104,12 +108,12 @@ class Map():
     
 if __name__ == '__main__':    
     figr = plt.figure(figsize=(8,4))
-    axr = figr.add_subplot(111, projection='polar')
-    axr.set_theta_direction(-1)
-    axr.set_theta_offset(np.pi / 2.0)
-
+    axr = figr.add_subplot(111)
+    axr.set_aspect('equal')
+    
     figw = plt.figure(figsize=(8,4))
     axw = figw.add_subplot(111)
+    axw.set_aspect('equal')
 
     pgon = sg.Polygon([sg.Point2(-50, 50),
                        sg.Point2(50, 50),
