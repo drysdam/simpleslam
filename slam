@@ -99,8 +99,9 @@ class Robot():
             print(ang, worldang)
             angs2.append(worldang)
             rngs.append(rng)
-            xs.append(self.robotpos[0] + rng*np.cos(np.deg2rad(worldang)))
-            ys.append(self.robotpos[1] + rng*np.sin(np.deg2rad(worldang)))
+            # not clear why sin/cos are swapped here...
+            xs.append(self.robotpos[0] + rng*np.sin(np.deg2rad(worldang)))
+            ys.append(self.robotpos[1] + rng*np.cos(np.deg2rad(worldang)))
 
         return ([np.array(angs2), np.array(rngs)],
                 [np.array(xs), np.array(ys)])
@@ -173,11 +174,12 @@ if __name__ == '__main__':
     axr = figr.add_subplot(111)
     axr.set_aspect('equal')
     
-    pgon = sg.Polygon([sg.Point2(-50, 50),
-                       sg.Point2(50, 50),
-                       sg.Point2(50, -50),
-                       sg.Point2(-50, -50)])
+    pgon = sg.Polygon([sg.Point2(-40, 50),
+                       sg.Point2(60, 50),
+                       sg.Point2(40, -50),
+                       sg.Point2(-60, -50)])
     W = World(pgon)
+    W.graph()
     R = Robot(W)
     M = SLAMMap()
 
