@@ -130,18 +130,22 @@ class SLAMMap():
         iters = 0
         done = False
         while not done:
+            # pick a random point not already used
             idx = np.random.randint(0, len(angs))
             while idx in usedidxs:
                 idx = np.random.randint(0, len(angs))
-                
+
+            # get no more than S unused points within D degrees of it
             idxs = np.where(abs((angs[idx] - angs + 180) % 360 - 180) < D)[0]
             idxs = list(set(idxs) - set(usedidxs))
             idxs = idxs[0:S]
 
+            # fit a line to those S points and check how many are close
             p = np.polyfit(xs[idxs], ys[idxs], deg=1)
             diffs0 = np.abs(np.polyval(p, xs[idxs]) - ys[idxs])
             idxs = np.where(diffs0 < X)[0]
-            
+
+            # if we had a consensus, get *all* the close, unused points
             if len(idxs) > C:
                 diffs = np.abs(np.polyval(p, xs) - ys)
                 idxs = np.where(diffs < X)[0]
@@ -149,8 +153,8 @@ class SLAMMap():
                 p = np.polyfit(xs[idxs], ys[idxs], deg=1)
                 features.append([p, idxs])
                 usedidxs += idxs
-            iters += 1
 
+            iters += 1
             if iters > N:
                 done = True
             if len(angs) - len(usedidxs) < C:
@@ -171,7 +175,7 @@ if __name__ == '__main__':
     R = Robot(W)
     M = SLAMMap()
 
-    R.rotate(12.2)
+    R.rotate(11)
     
     polarpts, cartpts = R.lidarsweep()
     axr.plot(cartpts[0], cartpts[1], '.', markersize=3)
