@@ -19,8 +19,8 @@ class World():
     def __init__(self, polygonmap):
         # these should probably be properties of the Robot
         self.angerrmax = .1
-        self.poserrmax = .1
-        self.lidardisterr = .1
+        self.poserrmax = .01
+        self.lidardisterr = .01
         self.lidardropoutfrac = .1
         
         self.pgonmap = polygonmap
@@ -104,10 +104,48 @@ class SLAMMap():
         pass
 
     def extract_features(self, polarpts, cartpts):
-        pass
-        # RANSAC
-    
-    
+        angs, rngs = polarpts
+        xs, ys = cartpts
+
+        # RANSAC (features are lines)
+        # while (still have unextracted points
+        #        and number  of points remaining is at least C
+        #        and have done no more than N iterations)
+        #   choose a random point not in an extract feature
+        #   choose S other points no more than D degrees away
+        #   fit line to S+1 points
+        #   if at least C points are within X meters
+        #     find all points with X meters and make new line fit
+        #     add line to feature list
+        #     remove points from consideration
+        S = 10
+        D = 10
+        C = 5
+        X = .02
+        
+        features = []
+        
+        idx = 50
+        idxs = np.where(abs((angs[idx] - angs + 180) % 360 - 180) < D)
+        idxs = idxs[0][0:S]
+        # print('angs:', angs[idxs])
+        # print('xs:', xs[idxs])
+        # print('ys:', ys[idxs])
+        p = np.polyfit(xs[idxs], ys[idxs], deg=1)
+        # print('p:', p)
+        diffs0 = np.abs(np.polyval(p, xs[idxs]) - ys[idxs])
+        # print('diffs0:', diffs0)
+        idxs = np.where(diffs0 < X)
+        if len(idxs[0]) > C:
+            diffs = np.abs(np.polyval(p, xs) - ys)
+            # print('diffs:', diffs)
+            idxs = np.where(diffs < X)
+            # print('idxs:', idxs)
+            p = np.polyfit(xs[idxs], ys[idxs], deg=1)
+            features.append([p, idxs])
+
+        return features
+        
 if __name__ == '__main__':    
     figr = plt.figure(figsize=(8,4))
     axr = figr.add_subplot(111)
@@ -123,8 +161,12 @@ if __name__ == '__main__':
     
     polarpts, cartpts = R.lidarsweep()
     axr.plot(cartpts[0], cartpts[1], '.', markersize=3)
-    M.extract_features(polarpts, cartpts)
-
+    features = M.extract_features(polarpts, cartpts)
+    for p, idxs in features:
+        axr.plot(cartpts[0][idxs],
+                 np.polyval(p, cartpts[0][idxs]),
+                 color=(.1,.1,.1,.6))
+    
     # for i in range(360):
     #     R.rotate(1)
     # [angs, rngs], [xs, ys] = R.lidarsweep()
