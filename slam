@@ -176,16 +176,31 @@ if __name__ == '__main__':
     axr = figr.add_subplot(111)
     axr.set_aspect('equal')
     
-    pgon = sg.Polygon([sg.Point2(-40, 50),
-                       sg.Point2(60, 50),
-                       sg.Point2(40, -50),
-                       sg.Point2(-60, -50)])
+    # pgon = sg.Polygon([sg.Point2(-40, 50),
+    #                    sg.Point2(60, 50),
+    #                    sg.Point2(40, -50),
+    #                    sg.Point2(-60, -50)])
+
+    pgon = sg.Polygon([sg.Point2(-120, 0),
+                       sg.Point2(-40, 40),
+                       sg.Point2(-20, 0),
+                       sg.Point2(20, 20),
+                       sg.Point2(0, 60),
+                       sg.Point2(40, 80),
+                       sg.Point2(90, -20),
+                       sg.Point2(50, -40),
+                       sg.Point2(30, 0),
+                       sg.Point2(-10, -20),
+                       sg.Point2(10, -60),
+                       sg.Point2(-70, -100)])
+    
     W = World(pgon)
     # W.graph()
     R = Robot(W)
     M = SLAMMap()
 
     R.rotate(30)
+    R.translate(-10, -10)
     
     polarpts, cartpts = R.lidarsweep()
     axr.plot(cartpts[0], cartpts[1], '.', markersize=3)
