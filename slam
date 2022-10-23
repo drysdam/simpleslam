@@ -88,13 +88,19 @@ class Robot():
         xs = []
         ys = []
         for ang in angs:
+            # world knows where I *really* am and returns hits relative
+            # to that position and rotation angle.
             rng = W.probe(ang)
             if rng == None:
                 continue
-            angs2.append(ang)
+            # the *robot* has an *idea* of where it is and wants to
+            # unwrap those relative coordinates to world coordinates.
+            worldang = np.fmod(self.robotang + ang, 360)
+            print(ang, worldang)
+            angs2.append(worldang)
             rngs.append(rng)
-            xs.append(rng*np.cos(np.deg2rad(ang)))
-            ys.append(rng*np.sin(np.deg2rad(ang)))
+            xs.append(self.robotpos[0] + rng*np.cos(np.deg2rad(worldang)))
+            ys.append(self.robotpos[1] + rng*np.sin(np.deg2rad(worldang)))
 
         return ([np.array(angs2), np.array(rngs)],
                 [np.array(xs), np.array(ys)])
@@ -175,7 +181,7 @@ if __name__ == '__main__':
     R = Robot(W)
     M = SLAMMap()
 
-    R.rotate(11)
+    R.rotate(30)
     
     polarpts, cartpts = R.lidarsweep()
     axr.plot(cartpts[0], cartpts[1], '.', markersize=3)
