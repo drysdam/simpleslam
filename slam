@@ -109,7 +109,7 @@ class SLAMMap():
 
         # RANSAC (features are lines)
         # while (still have unextracted points
-        #        and number  of points remaining is at least C
+        #        and number of points remaining is at least C
         #        and have done no more than N iterations)
         #   choose a random point not in an extract feature
         #   choose S other points no more than D degrees away
@@ -122,28 +122,40 @@ class SLAMMap():
         D = 10
         C = 5
         X = .02
+        N = 10
         
         features = []
-        
-        idx = 50
-        idxs = np.where(abs((angs[idx] - angs + 180) % 360 - 180) < D)
-        idxs = idxs[0][0:S]
-        # print('angs:', angs[idxs])
-        # print('xs:', xs[idxs])
-        # print('ys:', ys[idxs])
-        p = np.polyfit(xs[idxs], ys[idxs], deg=1)
-        # print('p:', p)
-        diffs0 = np.abs(np.polyval(p, xs[idxs]) - ys[idxs])
-        # print('diffs0:', diffs0)
-        idxs = np.where(diffs0 < X)
-        if len(idxs[0]) > C:
-            diffs = np.abs(np.polyval(p, xs) - ys)
-            # print('diffs:', diffs)
-            idxs = np.where(diffs < X)
-            # print('idxs:', idxs)
-            p = np.polyfit(xs[idxs], ys[idxs], deg=1)
-            features.append([p, idxs])
 
+        usedidxs = []
+        iters = 0
+        done = False
+        while not done:
+            idx = np.random.randint(0, len(angs))
+            while idx in usedidxs:
+                idx = np.random.randint(0, len(angs))
+                
+            idxs = np.where(abs((angs[idx] - angs + 180) % 360 - 180) < D)[0]
+            idxs = list(set(idxs) - set(usedidxs))
+            idxs = idxs[0:S]
+
+            p = np.polyfit(xs[idxs], ys[idxs], deg=1)
+            diffs0 = np.abs(np.polyval(p, xs[idxs]) - ys[idxs])
+            idxs = np.where(diffs0 < X)[0]
+            
+            if len(idxs) > C:
+                diffs = np.abs(np.polyval(p, xs) - ys)
+                idxs = np.where(diffs < X)[0]
+                idxs = list(set(idxs) - set(usedidxs))
+                p = np.polyfit(xs[idxs], ys[idxs], deg=1)
+                features.append([p, idxs])
+                usedidxs += idxs
+            iters += 1
+
+            if iters > N:
+                done = True
+            if len(angs) - len(usedidxs) < C:
+                done = True
+            
         return features
         
 if __name__ == '__main__':    
@@ -158,6 +170,8 @@ if __name__ == '__main__':
     W = World(pgon)
     R = Robot(W)
     M = SLAMMap()
+
+    R.rotate(12.2)
     
     polarpts, cartpts = R.lidarsweep()
     axr.plot(cartpts[0], cartpts[1], '.', markersize=3)
