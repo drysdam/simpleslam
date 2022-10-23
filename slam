@@ -12,13 +12,13 @@ def deg2dir(ang):
     s = np.sin(rad)
     c = np.cos(rad)
     dir2 = sg.Direction2(100*s, 100*c)
-    print(ang, rad, s, c, dir2)
+    # print(ang, rad, s, c, dir2)
     return dir2
     
 class World():
     def __init__(self, polygonmap, ax = None):
         # these should probably be properties of the Robot
-        self.angerrmax = .1
+        self.angerrmax = .25
         self.poserrmax = .1
         self.lidardisterr = .1
         self.lidardropoutfrac = .1
@@ -28,18 +28,22 @@ class World():
         self.robotpos = [0, 0]
         self.robotang = 0
 
+        self.totalangerr = 0
+        
     def graph(self):
-        print(self.pgonmap)
+        # print(self.pgonmap)
         if not self.ax == None:
             sgdraw.draw(self.pgonmap)
 
     def robot_rotate(self, ang):
-        angerr = 2*self.angerrmax*np.random.random(1)-self.angerrmax/2.
+        angerr = 2*self.angerrmax*(np.random.random() - .5)
+        self.totalangerr += angerr
+        print(angerr, self.totalangerr)
         self.robotang = np.fmod(self.robotang + ang + angerr, 360)
 
     def robot_translate(self, dx, dy):
-        poserrx = 2*self.poserrmax*np.random.random(1)-self.poserrmax/2.
-        poserry = 2*self.poserrmax*np.random.random(1)-self.poserrmax/2.
+        poserrx = 2*self.poserrmax*(np.random.random() - .5)
+        poserry = 2*self.poserrmax*(np.random.random() - .5)
         self.robotpos[0] = self.robotpos[0] + dx + poserrx
         self.robotpos[1] = self.robotpos[1] + dy + poserry
         
@@ -47,7 +51,8 @@ class World():
         # ray = sg.Ray2(sg.Point2(0, 0),
         #               sg.Point2(10, 0))
         origin = sg.Point2(self.robotpos[0], self.robotpos[1])
-        ray = sg.Ray2(origin, deg2dir(self.robotang+scanangle))
+        ray = sg.Ray2(origin,
+                      deg2dir(np.fmod(self.robotang + scanangle, 360)))
         #sgdraw.draw(ray, display_range=100)
         mind = 1e10
         for edge in self.pgonmap.edges:
@@ -57,9 +62,9 @@ class World():
             d = np.sqrt(float((isct - origin).squared_length()))
             mind = min(mind, d)
 
-        if np.random.random(1) < self.lidardropoutfrac:
+        if np.random.random() < self.lidardropoutfrac:
             return None
-        return mind+self.lidardisterr*np.random.random(1)-self.lidardisterr/2.
+        return mind+self.lidardisterr*(np.random.random() - .5)
 
     
 class Robot():
@@ -69,9 +74,9 @@ class Robot():
         self.robotpos = [0, 0]
         self.robotang = 0
         
-    def rotate(self, theta):
-        self.robotang += theta
-        self.W.robot_rotate(theta)
+    def rotate(self, ang):
+        self.robotang = np.fmod(self.robotang + ang, 360)
+        self.W.robot_rotate(ang)
 
     def translate(self, dx, dy):
         self.robotpos[0] += dx
@@ -115,8 +120,8 @@ if __name__ == '__main__':
 
     R = Robot(W, ax=axr)
     R.lidarsweep(graph=True)
-    R.rotate(30)
-    R.translate(10, 0)
+    for i in range(360):
+        R.rotate(1)
     R.lidarsweep(graph=True)
     
     # angs = range(0, 360, 1)
