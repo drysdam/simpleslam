@@ -96,7 +96,6 @@ class Robot():
             # the *robot* has an *idea* of where it is and wants to
             # unwrap those relative coordinates to world coordinates.
             worldang = np.fmod(self.robotang + ang, 360)
-            print(ang, worldang)
             angs2.append(worldang)
             rngs.append(rng)
             # not clear why sin/cos are swapped here...
@@ -179,7 +178,7 @@ if __name__ == '__main__':
                        sg.Point2(40, -50),
                        sg.Point2(-60, -50)])
     W = World(pgon)
-    W.graph()
+    # W.graph()
     R = Robot(W)
     M = SLAMMap()
 
@@ -192,10 +191,5 @@ if __name__ == '__main__':
         axr.plot(cartpts[0][idxs],
                  np.polyval(p, cartpts[0][idxs]),
                  color=(.1,.1,.1,.6))
-    
-    # for i in range(360):
-    #     R.rotate(1)
-    # [angs, rngs], [xs, ys] = R.lidarsweep()
-    # axr.plot(xs, ys, '.', markersize=3)
 
     plt.show()
