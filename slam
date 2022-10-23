@@ -16,7 +16,7 @@ def deg2dir(ang):
     return dir2
     
 class World():
-    def __init__(self, polygonmap, ax = None):
+    def __init__(self, polygonmap):
         # these should probably be properties of the Robot
         self.angerrmax = .1
         self.poserrmax = .1
@@ -24,16 +24,16 @@ class World():
         self.lidardropoutfrac = .1
         
         self.pgonmap = polygonmap
-        self.ax = ax
         self.robotpos = [0, 0]
         self.robotang = 0
 
         self.totalangerr = 0
         
     def graph(self):
-        # print(self.pgonmap)
-        if not self.ax == None:
-            sgdraw.draw(self.pgonmap)
+        figw = plt.figure(figsize=(8,4))
+        ax = figw.add_subplot(111)
+        ax.set_aspect('equal')
+        sgdraw.draw(self.pgonmap)
 
     def robot_rotate(self, ang):
         angerr = 2*self.angerrmax*(np.random.random() - .5)
@@ -99,9 +99,13 @@ class Robot():
         return ([np.array(angs2), np.array(rngs)],
                 [np.array(xs), np.array(ys)])
                 
-class Map():
+class SLAMMap():
     def __init(self):
         pass
+
+    def extract_features(self, polarpts, cartpts):
+        pass
+        # RANSAC
     
     
 if __name__ == '__main__':    
@@ -109,23 +113,21 @@ if __name__ == '__main__':
     axr = figr.add_subplot(111)
     axr.set_aspect('equal')
     
-    figw = plt.figure(figsize=(8,4))
-    axw = figw.add_subplot(111)
-    axw.set_aspect('equal')
-
     pgon = sg.Polygon([sg.Point2(-50, 50),
                        sg.Point2(50, 50),
                        sg.Point2(50, -50),
                        sg.Point2(-50, -50)])
-    W = World(pgon, ax=axw)
-    W.graph()
-
+    W = World(pgon)
     R = Robot(W)
-    [angs, rngs], [xs, ys] = R.lidarsweep()
-    axr.plot(xs, ys, '.', markersize=3)
-    for i in range(360):
-        R.rotate(1)
-    [angs, rngs], [xs, ys] = R.lidarsweep()
-    axr.plot(xs, ys, '.', markersize=3)
+    M = SLAMMap()
+    
+    polarpts, cartpts = R.lidarsweep()
+    axr.plot(cartpts[0], cartpts[1], '.', markersize=3)
+    M.extract_features(polarpts, cartpts)
+
+    # for i in range(360):
+    #     R.rotate(1)
+    # [angs, rngs], [xs, ys] = R.lidarsweep()
+    # axr.plot(xs, ys, '.', markersize=3)
 
     plt.show()
