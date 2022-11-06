@@ -156,11 +156,23 @@ class SLAMMap():
                 diffs = np.abs(np.polyval(p, xs) - ys)
                 idxs = np.where(diffs < X)[0]
                 idxs = list(set(idxs) - set(usedidxs))
-                p = np.polyfit(xs[idxs], ys[idxs], deg=1)
 
+                # representing these as polynomials, but really should
+                # represent them as geometric lines, which would make
+                # finding intersections easy.
+                p = np.polyfit(xs[idxs], ys[idxs], deg=1)
                 pf = [-1./p[0], 0]
 
-                features.append([p, pf, idxs])
+                pl = sg.Line2(sg.Point2(-100, np.polyval(p, -100)),
+                              sg.Point2(100, np.polyval(p, 100)))
+                pfl = sg.Line2(sg.Point2(-100, np.polyval(pf, -100)),
+                               sg.Point2(100, np.polyval(pf, 100)))
+                featurepoint = sg.intersection(pl, pfl)
+                # sgdraw.draw(pl)
+                # sgdraw.draw(pfl)
+                # sgdraw.draw(featurepoint)
+                
+                features.append([p, featurepoint, idxs])
                 usedidxs += idxs
 
             iters += 1
@@ -205,12 +217,10 @@ if __name__ == '__main__':
     polarpts, cartpts = R.lidarsweep()
     axr.plot(cartpts[0], cartpts[1], '.', markersize=3)
     features = M.extract_features(polarpts, cartpts)
-    for p, pf, idxs in features:
+    for p, featurepoint, idxs in features:
         axr.plot(cartpts[0][idxs],
                  np.polyval(p, cartpts[0][idxs]),
                  color=(.1,.1,.1,.6))
-        # axr.plot(range(0, 3),
-        #          np.polyval(pf, range(0, 3)),
-        #          color=(.1,.1,.1,.6))
+        print(p, featurepoint)
 
     plt.show()
